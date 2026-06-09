@@ -1,3 +1,10 @@
+import {
+  GithubIcon,
+  LinearIcon,
+  NotionIcon,
+  SlackIcon,
+} from "./icons/IntegrationIcons";
+
 type SidebarProps = {
   activeItem: string;
 };
@@ -9,58 +16,67 @@ const navigationItems = [
   { label: "Saved Briefs", active: false },
 ];
 
-const integrations = ["Slack", "Linear", "Notion", "Case Jams"];
+const integrations = [
+  { label: "Slack", icon: SlackIcon, connected: true },
+  { label: "Linear", icon: LinearIcon, connected: true },
+  { label: "Notion", icon: NotionIcon, connected: true },
+  { label: "GitHub", icon: GithubIcon, connected: true },
+] as const;
 
 export function Sidebar({ activeItem }: SidebarProps) {
   return (
-    <aside className="flex w-full flex-col py-3">
-      <div>
-        <p className="text-[11px] font-medium uppercase tracking-[0.32em] text-faint">
-          Workspace
-        </p>
+    <aside className="flex h-full w-[248px] flex-none flex-col bg-navy px-5 py-7 text-mist">
+      <div className="font-sans text-[1.65rem] font-medium leading-none tracking-[-0.03em] text-mist">
+        Model ML
       </div>
 
-      <nav className="mt-8 space-y-2">
-        {navigationItems.map((item) => {
-          const isActive = item.label === activeItem;
-          return (
-            <button
-              key={item.label}
-              type="button"
-              disabled={!item.active}
-              className={`flex w-full items-center justify-between rounded-full border px-4 py-2.5 text-left text-sm transition ${
-                isActive
-                  ? "border-accentStrong bg-accentStrong text-mist"
-                  : "border-transparent bg-transparent text-muted"
-              } ${item.active ? "hover:border-sand hover:bg-white/40" : "cursor-not-allowed opacity-70"} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accentStrong/20 focus-visible:ring-offset-2`}
-            >
-              <span>{item.label}</span>
-              {isActive ? (
-                <span className="text-[11px] uppercase tracking-[0.2em] text-[#d8d4cd]">
-                  Open
-                </span>
-              ) : null}
-            </button>
-          );
-        })}
-      </nav>
+      <div className="mt-10">
+        <p className="text-[10px] font-medium uppercase tracking-[0.28em] text-[#7d8698]">
+          Workspace
+        </p>
+        <nav className="mt-4 space-y-1">
+          {navigationItems.map((item) => {
+            const isActive = item.label === activeItem;
+            return (
+              <button
+                key={item.label}
+                type="button"
+                disabled={!item.active}
+                className={`flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left text-sm transition ${
+                  isActive
+                    ? "bg-navyLight text-mist"
+                    : "text-[#9aa3b2] hover:bg-navyLight/60 hover:text-mist"
+                } ${item.active ? "" : "cursor-not-allowed opacity-60"}`}
+              >
+                <span>{item.label}</span>
+                {isActive ? (
+                  <span className="h-1.5 w-1.5 rounded-full bg-gold" />
+                ) : null}
+              </button>
+            );
+          })}
+        </nav>
+      </div>
 
-      <div className="mt-12 border-t border-sand pt-8">
-        <p className="text-[11px] font-medium uppercase tracking-[0.32em] text-faint">
+      <div className="mt-10">
+        <p className="text-[10px] font-medium uppercase tracking-[0.28em] text-[#7d8698]">
           Integrations
         </p>
         <div className="mt-4 space-y-2">
-          {integrations.map((source) => (
+          {integrations.map(({ label, icon: Icon, connected }) => (
             <div
-              key={source}
-              className="rounded-full border border-sand bg-white/32 px-4 py-2.5 text-sm text-muted"
+              key={label}
+              className="flex items-center gap-2.5 rounded-lg border border-[#2a3347] bg-[#121b2e] px-3 py-2.5 text-sm text-[#c5ccd8]"
             >
-              {source}
+              <Icon className="h-[18px] w-[18px] flex-none" />
+              <span className="flex-1">{label}</span>
+              <span
+                className={`h-1.5 w-1.5 rounded-full ${connected ? "bg-[#4ade80]" : "bg-[#6b7280]"}`}
+              />
             </div>
           ))}
         </div>
       </div>
-
     </aside>
   );
 }

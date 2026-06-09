@@ -1,13 +1,30 @@
 import { FormEvent, useEffect, useRef, useState } from "react";
-import { PromptCard } from "./components/PromptCard";
 import { ResponseCard } from "./components/ResponseCard";
 import { RoleChips } from "./components/RoleChips";
 import { Sidebar } from "./components/Sidebar";
+import { SuggestedPromptPill } from "./components/SuggestedPromptPill";
 import { TypingIndicator } from "./components/TypingIndicator";
 import { getResponseForInput, promptsByRole, roles } from "./data";
 import type { Message, PromptDefinition, Role } from "./types";
 
-const headerItems = ["Agent", "Knowledge Hub", "Updates", "Saved Briefs"];
+function getGreeting() {
+  const hour = new Date().getHours();
+  if (hour < 12) {
+    return "Good morning";
+  }
+  if (hour < 18) {
+    return "Good afternoon";
+  }
+  return "Good evening";
+}
+
+function formatToday() {
+  return new Intl.DateTimeFormat("en-GB", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  }).format(new Date());
+}
 
 function App() {
   const [activeRole, setActiveRole] = useState<Role>("Sales");
@@ -18,6 +35,7 @@ function App() {
   const chatViewportRef = useRef<HTMLDivElement | null>(null);
 
   const suggestedPrompts = promptsByRole[activeRole];
+  const hasConversation = messages.length > 0 || isTyping;
 
   useEffect(() => {
     return () => {
@@ -79,7 +97,7 @@ function App() {
           id: `assistant-${Date.now()}`,
           type: "assistant",
           content: response.answer,
-          sources: response.sources,
+          attachments: response.attachments,
           lastUpdated: response.lastUpdated,
         },
       ]);
@@ -91,7 +109,7 @@ function App() {
   }
 
   function handlePromptClick(prompt: PromptDefinition) {
-    queueResponse(prompt.text, prompt.role);
+    queueResponse(prompt.query, prompt.role);
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -100,151 +118,141 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[rgb(245,245,244)] text-ink">
-      <div className="h-7 bg-black" />
+    <div className="flex min-h-screen bg-cream text-ink">
+      <Sidebar activeItem="Agent" />
 
-      <header className="border-b border-sand bg-[rgba(245,245,244,0.84)] backdrop-blur-sm">
-        <div className="mx-auto flex max-w-[1680px] items-center justify-between px-8 py-4 lg:px-10">
-          <div className="font-sans text-[1.9rem] font-medium leading-none tracking-[-0.03em] text-ink">
-            Model ML
+      <div className="flex min-w-0 flex-1 flex-col">
+        <header className="border-b border-[#ddd6ca] bg-[#ebe4d8] px-8 py-4 lg:px-10">
+          <div className="flex items-center justify-between gap-6">
+            <RoleChips
+              activeRole={activeRole}
+              roles={roles}
+              onSelect={resetConversation}
+            />
+            <p className="hidden text-sm text-muted sm:block">{formatToday()}</p>
           </div>
+        </header>
 
-          <div className="hidden items-center gap-8 lg:flex">
-            <nav className="flex items-center gap-8 text-[15px] text-muted">
-              {headerItems.map((item) => (
-                <button
-                  key={item}
-                  type="button"
-                  className="transition hover:text-ink"
-                >
-                  {item}
-                </button>
-              ))}
-            </nav>
-            <button
-              type="button"
-              className="rounded-full bg-accentStrong px-6 py-3 text-sm font-medium text-mist"
-            >
-              Internal preview
-            </button>
-          </div>
-        </div>
-      </header>
+        <main className="flex flex-1 flex-col px-8 py-10 lg:px-10">
+          {!hasConversation ? (
+            <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center pt-[10vh] sm:pt-[12vh]">
+              <h1 className="text-center font-serif text-[2.6rem] font-normal leading-tight tracking-[-0.03em] text-ink md:text-[3.2rem]">
+                {getGreeting()}, Raghav
+              </h1>
 
-      <div className="mx-auto max-w-[1680px] px-8 py-12 lg:px-10 lg:py-16">
-        <div className="border-t border-sand pt-10">
-          <div className="grid gap-10 xl:grid-cols-[180px_minmax(0,1fr)]">
-            <div className="xl:pt-6">
-              <Sidebar activeItem="Agent" />
-            </div>
-
-            <main className="grid gap-10 xl:grid-cols-[minmax(370px,470px)_minmax(0,1fr)] xl:items-start">
-              <section className="xl:sticky xl:top-10">
-                <div className="max-w-[470px]">
-                  <h2 className="font-serif text-[3rem] font-normal leading-[1.04] tracking-[-0.025em] text-ink md:text-[3.7rem] xl:text-[4rem]">
-                    Good morning Raghav, what can I help you with?
-                  </h2>
-                  <div className="mt-8">
-                    <RoleChips
-                      activeRole={activeRole}
-                      roles={roles}
-                      onSelect={resetConversation}
+              <form onSubmit={handleSubmit} className="mt-10 w-full">
+                <div className="rounded-[28px] border border-[#ddd8cf] bg-white p-4 shadow-[0_8px_30px_rgba(34,31,29,0.06)]">
+                  <label>
+                    <span className="sr-only">Ask Ops Agent a question</span>
+                    <textarea
+                      value={inputValue}
+                      onChange={(event) => setInputValue(event.target.value)}
+                      rows={3}
+                      placeholder="Ask about product updates, client workflows, onboarding, or field feedback…"
+                      className="min-h-[88px] w-full resize-none rounded-[18px] border border-transparent bg-transparent px-3 py-2 text-[15px] leading-7 text-ink outline-none placeholder:text-faint"
                     />
-                  </div>
-                </div>
-              </section>
-
-              <section className="rounded-[34px] border border-[#d8dde6] bg-[linear-gradient(180deg,rgba(219,226,238,0.88)_0%,rgba(231,236,243,0.92)_100%)] p-4 shadow-[0_28px_60px_rgba(34,31,29,0.08)] lg:p-6">
-                <div className="overflow-hidden rounded-[28px] border border-white/45 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.55),transparent_30%),linear-gradient(180deg,rgba(244,248,252,0.86)_0%,rgba(235,240,246,0.84)_100%)] p-5 backdrop-blur-sm lg:p-6">
-                  <div className="rounded-[26px] border border-white/55 bg-[rgba(255,255,255,0.34)] p-4 backdrop-blur-md lg:p-5">
-                    <div
-                      ref={chatViewportRef}
-                      className="min-h-[280px] space-y-5 overflow-y-auto lg:min-h-[320px]"
+                  </label>
+                  <div className="mt-3 flex items-center justify-between gap-3">
+                    <button
+                      type="button"
+                      className="flex h-9 w-9 items-center justify-center rounded-full border border-[#e8e4dc] text-lg text-faint"
+                      aria-label="Add attachment"
                     >
-                      {messages.length === 0 && !isTyping ? (
-                        <div className="flex min-h-[220px] items-center justify-center px-6 text-center">
-                          <p className="max-w-md text-base leading-7 text-faint">
-                            Select a prompt or ask a question to start.
-                          </p>
-                        </div>
-                      ) : null}
-
-                      {messages.map((message) =>
-                        message.type === "user" ? (
-                          <div key={message.id} className="flex justify-end">
-                            <div className="max-w-2xl rounded-[18px] rounded-br-[8px] border border-white/45 bg-[rgba(255,255,255,0.48)] px-5 py-3.5 text-sm leading-7 text-ink">
-                              {message.content}
-                            </div>
-                          </div>
-                        ) : (
-                          <div key={message.id} className="max-w-[760px]">
-                            <ResponseCard
-                              content={message.content}
-                              sources={message.sources}
-                              lastUpdated={message.lastUpdated}
-                            />
-                          </div>
-                        ),
-                      )}
-
-                      {isTyping ? (
-                        <div className="max-w-[420px]">
-                          <TypingIndicator />
-                        </div>
-                      ) : null}
+                      +
+                    </button>
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm text-faint">Ops Agent · {activeRole}</span>
+                      <button
+                        type="button"
+                        className="flex h-9 w-9 items-center justify-center rounded-full text-faint"
+                        aria-label="Voice input"
+                      >
+                        <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true">
+                          <path strokeLinecap="round" d="M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3z" />
+                          <path strokeLinecap="round" d="M8 11.5a4 4 0 0 0 8 0M12 15.5V19" />
+                        </svg>
+                      </button>
+                      <button
+                        type="submit"
+                        className="flex h-10 w-10 items-center justify-center rounded-full bg-navy text-lg text-mist transition hover:bg-navyLight disabled:cursor-not-allowed disabled:bg-[#c8c3bc]"
+                        disabled={!inputValue.trim() || isTyping}
+                        aria-label="Send message"
+                      >
+                        ↑
+                      </button>
                     </div>
-
-                    <form onSubmit={handleSubmit} className="mt-6">
-                      <div className="rounded-[30px] border border-[rgba(34,31,29,0.08)] bg-[rgba(255,255,255,0.56)] p-3 shadow-panel backdrop-blur-[18px]">
-                        <div className="flex items-end gap-3">
-                          <div className="mb-2 flex h-10 w-10 flex-none items-center justify-center rounded-full border border-white/70 bg-white/38 text-lg text-faint">
-                            +
-                          </div>
-                          <label className="flex-1">
-                            <span className="sr-only">Ask Ops Agent a question</span>
-                            <textarea
-                              value={inputValue}
-                              onChange={(event) => setInputValue(event.target.value)}
-                              rows={3}
-                              placeholder="Ask about product updates, client workflows, onboarding, or field feedback…"
-                              className="min-h-[96px] w-full resize-none rounded-[22px] border border-transparent bg-transparent px-4 py-3 text-[14px] leading-6 text-ink outline-none transition placeholder:text-faint focus:border-white/65 focus:bg-white/18"
-                            />
-                          </label>
-                          <button
-                            type="submit"
-                            className="mb-1 flex h-12 w-12 flex-none items-center justify-center rounded-full bg-accentStrong text-lg text-mist transition hover:bg-[#1c1918] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accentStrong/20 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#c8c3bc]"
-                            disabled={!inputValue.trim() || isTyping}
-                            aria-label="Send message"
-                          >
-                            ↑
-                          </button>
-                        </div>
-                      </div>
-                    </form>
                   </div>
-
-                  <section className="mt-6 border-t border-white/50 pt-6">
-                    <div className="mb-4 flex items-center justify-between">
-                      <h3 className="text-[11px] font-medium uppercase tracking-[0.3em] text-faint">
-                        Suggested prompts
-                      </h3>
-                      <p className="text-sm text-muted">Personalized for {activeRole}</p>
-                    </div>
-                    <div className="grid gap-4 xl:grid-cols-3">
-                      {suggestedPrompts.map((prompt) => (
-                        <PromptCard
-                          key={prompt.text}
-                          prompt={prompt}
-                          onClick={handlePromptClick}
-                        />
-                      ))}
-                    </div>
-                  </section>
                 </div>
-              </section>
-            </main>
-          </div>
-        </div>
+              </form>
+
+              <div className="mt-6 flex min-h-28 w-full flex-wrap content-start justify-center gap-3">
+                {suggestedPrompts.map((prompt) => (
+                  <SuggestedPromptPill
+                    key={prompt.text}
+                    prompt={prompt}
+                    onClick={handlePromptClick}
+                  />
+                ))}
+              </div>
+
+              <p className="mt-8 min-h-[3rem] max-w-lg text-center text-sm leading-6 text-faint">
+                Scoped to {activeRole} — cuts through the noise and surfaces what you need to know
+              </p>
+            </div>
+          ) : (
+            <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col">
+              <div
+                ref={chatViewportRef}
+                className="flex-1 space-y-8 overflow-y-auto pb-8"
+              >
+                {messages.map((message) =>
+                  message.type === "user" ? (
+                    <div key={message.id} className="flex justify-end">
+                      <div className="max-w-[85%] rounded-[22px] rounded-br-md bg-[#e8e4dc] px-5 py-3.5 text-[15px] leading-7 text-ink">
+                        {message.content}
+                      </div>
+                    </div>
+                  ) : (
+                    <div key={message.id} className="flex justify-start">
+                      <ResponseCard
+                        content={message.content}
+                        attachments={message.attachments}
+                        lastUpdated={message.lastUpdated}
+                      />
+                    </div>
+                  ),
+                )}
+
+                {isTyping ? <TypingIndicator /> : null}
+              </div>
+
+              <form onSubmit={handleSubmit} className="sticky bottom-0 border-t border-[#e5dfd4] bg-cream/95 pb-2 pt-4 backdrop-blur-sm">
+                <div className="rounded-[24px] border border-[#ddd8cf] bg-white p-3 shadow-[0_4px_20px_rgba(34,31,29,0.05)]">
+                  <div className="flex items-end gap-3">
+                    <label className="flex-1">
+                      <span className="sr-only">Ask Ops Agent a question</span>
+                      <textarea
+                        value={inputValue}
+                        onChange={(event) => setInputValue(event.target.value)}
+                        rows={2}
+                        placeholder="Ask a follow-up…"
+                        className="min-h-[56px] w-full resize-none rounded-[16px] border border-transparent bg-transparent px-3 py-2 text-[15px] leading-6 text-ink outline-none placeholder:text-faint"
+                      />
+                    </label>
+                    <button
+                      type="submit"
+                      className="mb-1 flex h-10 w-10 flex-none items-center justify-center rounded-full bg-navy text-lg text-mist transition hover:bg-navyLight disabled:cursor-not-allowed disabled:bg-[#c8c3bc]"
+                      disabled={!inputValue.trim() || isTyping}
+                      aria-label="Send message"
+                    >
+                      ↑
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          )}
+        </main>
       </div>
     </div>
   );

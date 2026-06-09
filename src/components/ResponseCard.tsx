@@ -1,45 +1,89 @@
+import type { AnswerBlock } from "../types";
+import { SourceCitation } from "./SourceCitation";
+import { ResponseAttachments } from "./ResponseAttachments";
+import type { ResponseAttachment } from "../types";
+
 type ResponseCardProps = {
-  content: string[];
-  sources: string[];
+  content: AnswerBlock[];
+  attachments?: ResponseAttachment[];
   lastUpdated: string;
 };
 
 export function ResponseCard({
   content,
-  sources,
+  attachments,
   lastUpdated,
 }: ResponseCardProps) {
   return (
-    <article className="rounded-[24px] border border-white/65 bg-[rgba(255,255,255,0.62)] p-6 shadow-[0_18px_34px_rgba(34,31,29,0.06)] backdrop-blur-md">
-      <div className="space-y-4 text-[15px] leading-7 text-[#37332f]">
-        {content.map((paragraph) => (
-          <p key={paragraph}>{paragraph}</p>
-        ))}
+    <article className="max-w-[760px]">
+      <div className="space-y-5 text-[15px] leading-7 text-ink">
+        {content.map((block, index) => {
+          if (block.kind === "paragraph") {
+            return (
+              <p key={`paragraph-${index}`}>
+                {block.text}
+                <SourceCitation sources={block.sources} />
+              </p>
+            );
+          }
+
+          if (block.kind === "table") {
+            return (
+              <div key={`table-${index}`} className="space-y-3">
+                <p>{block.caption}</p>
+                <div className="overflow-x-auto rounded-2xl border border-[#e5e2dc] bg-white">
+                  <table className="min-w-full text-left text-sm">
+                    <thead className="border-b border-[#ece8e1] bg-[#faf8f4]">
+                      <tr>
+                        {block.headers.map((header) => (
+                          <th
+                            key={header}
+                            className="px-4 py-3 font-medium text-[#5c5852]"
+                          >
+                            {header}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {block.rows.map((row) => (
+                        <tr
+                          key={row.join("-")}
+                          className="border-b border-[#f0ece5] last:border-b-0"
+                        >
+                          {row.map((cell) => (
+                            <td key={cell} className="px-4 py-3 text-ink">
+                              {cell}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <p>
+                  <SourceCitation sources={block.sources} />
+                </p>
+              </div>
+            );
+          }
+
+          return (
+            <p
+              key={`followup-${index}`}
+              className="rounded-2xl border border-[#e8e4dc] bg-[#faf8f4] px-4 py-3 text-[#4b4742]"
+            >
+              {block.text}
+            </p>
+          );
+        })}
       </div>
 
-      <div className="mt-6 border-t border-sand/80 pt-4 text-sm text-muted">
-        <div className="flex flex-col gap-2">
-          <p>
-            <span className="font-medium text-ink">Source:</span>{" "}
-            {sources.map((source, index) => (
-              <span key={source}>
-                <a
-                  href="#"
-                  onClick={(event) => event.preventDefault()}
-                  className="underline decoration-sand underline-offset-4 transition hover:text-ink"
-                >
-                  {source}
-                </a>
-                {index < sources.length - 1 ? " / " : ""}
-              </span>
-            ))}
-          </p>
-          <p>
-            <span className="font-medium text-ink">Last updated:</span>{" "}
-            {lastUpdated}
-          </p>
-        </div>
-      </div>
+      {attachments && attachments.length > 0 ? (
+        <ResponseAttachments attachments={attachments} />
+      ) : null}
+
+      <p className="mt-5 text-xs text-faint">Last updated {lastUpdated}</p>
     </article>
   );
 }
