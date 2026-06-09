@@ -79,6 +79,6 @@ export type Message =
       type: "assistant";
       content: AnswerBlock[];
       attachments?: ResponseAttachment[];
-      lastUpdated: string;
+      lastUpdated?: string;
       showSources?: boolean;
     };

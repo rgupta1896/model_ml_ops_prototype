@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ResponseCard } from "./components/ResponseCard";
 import { RoleChips } from "./components/RoleChips";
 import { Sidebar } from "./components/Sidebar";
@@ -28,10 +28,11 @@ function formatToday() {
   }).format(new Date());
 }
 
+const prototypeInputMessage = "This prototype is illustrative. Choose one of the sample prompts below...";
+
 function App() {
   const [activeWorkspace, setActiveWorkspace] = useState<WorkspaceTab>("Agent");
-  const [activeRole, setActiveRole] = useState<Role>("Sales");
-  const [inputValue, setInputValue] = useState("");
+  const [activeRole, setActiveRole] = useState<Role>("EM");
   const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [pendingTimeoutId, setPendingTimeoutId] = useState<number | null>(null);
@@ -66,7 +67,6 @@ function App() {
     setActiveRole(nextRole);
     setMessages([]);
     setIsTyping(false);
-    setInputValue("");
   }
 
   function queueResponse(question: string, role: Role, showSources = false) {
@@ -92,7 +92,6 @@ function App() {
       },
     ]);
     setIsTyping(true);
-    setInputValue("");
 
     const delay = 700 + Math.floor(Math.random() * 501);
     const timeoutId = window.setTimeout(() => {
@@ -116,11 +115,6 @@ function App() {
 
   function handlePromptClick(prompt: PromptDefinition) {
     queueResponse(prompt.query, prompt.role, true);
-  }
-
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    queueResponse(inputValue, activeRole, false);
   }
 
   return (
@@ -151,22 +145,21 @@ function App() {
           ) : !hasConversation ? (
             <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center pt-[10vh] sm:pt-[12vh]">
               <h1 className="text-center font-serif text-[2.6rem] font-normal leading-tight tracking-[-0.03em] text-ink md:text-[3.2rem]">
-                {getGreeting()}, Raghav
+                {getGreeting()}, Ahmed
               </h1>
-              <p className="mt-5 max-w-2xl text-center text-[15px] leading-7 text-muted">
-                Ops Agent connects internal sources into role-aware context. Select a role to see the questions that matter for that team, or ask directly.
+              <p className="mt-5 max-w-2xl text-center text-lg leading-8 text-muted">
+                Ops Agent connects internal sources into role-aware context. Select a role to see the questions that matter for that team, then click a sample prompt to explore a response.
               </p>
 
-              <form onSubmit={handleSubmit} className="mt-10 w-full">
+              <div className="mt-10 w-full">
                 <div className="rounded-[28px] border border-[#ddd8cf] bg-white p-4 shadow-[0_8px_30px_rgba(34,31,29,0.06)]">
                   <label>
-                    <span className="sr-only">Ask {activeAgentLabel} a question</span>
+                    <span className="sr-only">{prototypeInputMessage}</span>
                     <textarea
-                      value={inputValue}
-                      onChange={(event) => setInputValue(event.target.value)}
+                      value={prototypeInputMessage}
+                      readOnly
                       rows={3}
-                      placeholder="Ask about product updates, client workflows, onboarding, or field feedback…"
-                      className="min-h-[88px] w-full resize-none rounded-[18px] border border-transparent bg-transparent px-3 py-2 text-[15px] leading-7 text-ink outline-none placeholder:text-faint"
+                      className="min-h-[88px] w-full resize-none rounded-[18px] border border-transparent bg-transparent px-3 py-2 text-[15px] leading-7 text-faint outline-none"
                     />
                   </label>
                   <div className="mt-3 flex items-center justify-between gap-3">
@@ -190,9 +183,9 @@ function App() {
                         </svg>
                       </button>
                       <button
-                        type="submit"
-                        className="flex h-10 w-10 items-center justify-center rounded-full bg-navy text-lg text-mist transition hover:bg-navyLight disabled:cursor-not-allowed disabled:bg-[#c8c3bc]"
-                        disabled={!inputValue.trim() || isTyping}
+                        type="button"
+                        className="flex h-10 w-10 items-center justify-center rounded-full bg-[#c8c3bc] text-lg text-mist"
+                        disabled
                         aria-label="Send message"
                       >
                         ↑
@@ -200,7 +193,7 @@ function App() {
                     </div>
                   </div>
                 </div>
-              </form>
+              </div>
 
               <div className="mt-6 flex min-h-28 w-full flex-wrap content-start justify-center gap-3">
                 {suggestedPrompts.map((prompt) => (
@@ -240,30 +233,39 @@ function App() {
                 {isTyping ? <TypingIndicator agentLabel={activeAgentLabel} /> : null}
               </div>
 
-              <form onSubmit={handleSubmit} className="sticky bottom-0 border-t border-[#e5dfd4] bg-cream/95 pb-2 pt-4 backdrop-blur-sm">
+              <div className="sticky bottom-0 border-t border-[#e5dfd4] bg-cream/95 pb-2 pt-4 backdrop-blur-sm">
                 <div className="rounded-[24px] border border-[#ddd8cf] bg-white p-3 shadow-[0_4px_20px_rgba(34,31,29,0.05)]">
                   <div className="flex items-end gap-3">
                     <label className="flex-1">
-                      <span className="sr-only">Ask {activeAgentLabel} a question</span>
+                      <span className="sr-only">{prototypeInputMessage}</span>
                       <textarea
-                        value={inputValue}
-                        onChange={(event) => setInputValue(event.target.value)}
+                        value={prototypeInputMessage}
+                        readOnly
                         rows={2}
-                        placeholder="Ask a follow-up…"
-                        className="min-h-[56px] w-full resize-none rounded-[16px] border border-transparent bg-transparent px-3 py-2 text-[15px] leading-6 text-ink outline-none placeholder:text-faint"
+                        className="min-h-[56px] w-full resize-none rounded-[16px] border border-transparent bg-transparent px-3 py-2 text-[15px] leading-6 text-faint outline-none"
                       />
                     </label>
                     <button
-                      type="submit"
-                      className="mb-1 flex h-10 w-10 flex-none items-center justify-center rounded-full bg-navy text-lg text-mist transition hover:bg-navyLight disabled:cursor-not-allowed disabled:bg-[#c8c3bc]"
-                      disabled={!inputValue.trim() || isTyping}
+                      type="button"
+                      className="mb-1 flex h-10 w-10 flex-none items-center justify-center rounded-full bg-[#c8c3bc] text-lg text-mist"
+                      disabled
                       aria-label="Send message"
                     >
                       ↑
                     </button>
                   </div>
                 </div>
-              </form>
+
+                <div className="mt-4 flex min-h-24 w-full flex-wrap content-start gap-3">
+                  {suggestedPrompts.map((prompt) => (
+                    <SuggestedPromptPill
+                      key={prompt.text}
+                      prompt={prompt}
+                      onClick={handlePromptClick}
+                    />
+                  ))}
+                </div>
+              </div>
             </div>
           )}
         </main>

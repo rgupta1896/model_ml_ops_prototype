@@ -189,7 +189,7 @@ export function KnowledgeHubPage() {
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col">
       <div className="max-w-3xl">
-        <h1 className="font-serif text-[2.9rem] leading-none tracking-[-0.04em] text-ink md:text-[4rem]">
+        <h1 className="font-serif text-[2.6rem] font-normal leading-tight tracking-[-0.03em] text-ink md:text-[3.2rem]">
           The Hub
         </h1>
         <p className="mt-5 text-lg text-muted">

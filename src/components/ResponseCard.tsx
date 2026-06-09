@@ -6,7 +6,7 @@ import type { ResponseAttachment } from "../types";
 type ResponseCardProps = {
   content: AnswerBlock[];
   attachments?: ResponseAttachment[];
-  lastUpdated: string;
+  lastUpdated?: string;
   showSources?: boolean;
 };
 
@@ -87,7 +87,7 @@ export function ResponseCard({
         <ResponseAttachments attachments={attachments} />
       ) : null}
 
-      <p className="mt-5 text-xs text-faint">Last updated {lastUpdated}</p>
+      {lastUpdated ? <p className="mt-5 text-xs text-faint">Last updated {lastUpdated}</p> : null}
     </article>
   );
 }

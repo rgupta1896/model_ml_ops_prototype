@@ -18,14 +18,14 @@ const forYouBriefs: BriefCard[] = [
     bullets: [
       "Workflows now come with a larger context window",
       "Chat is now voice-enabled",
-      "Field feedback surfaces in workflows (beta) to close the loop faster",
+      "User feedback surfaces in workflows (beta) to close the loop faster",
     ],
     tone: "text-[#2f6b2d]",
     icon: "cube",
     iconTint: "bg-[#edf4ea] text-[#3e6d37]",
   },
   {
-    title: "From the Field",
+    title: "User Signals",
     updated: "Updated 3h ago",
     bullets: [
       "UBS onboarding patterns: asset data mapping is the top friction point",
@@ -49,12 +49,12 @@ const forYouBriefs: BriefCard[] = [
     iconTint: "bg-[#f1edfb] text-[#5d47b3]",
   },
   {
-    title: "Signals to Act On",
+    title: "Key Insights",
     updated: "Updated 6h ago",
     bullets: [
       "7 clients added this week are engaging with workflows",
       "Churn risk: 3 accounts haven’t used key features in 14+ days",
-      "Follow up: Support escalations on exceptions workflow",
+      "Average in-session time is up 12% week over week across banking users",
     ],
     tone: "text-[#b16c17]",
     icon: "signals",
@@ -153,7 +153,7 @@ export function DailyBriefPage({
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col">
       <div className="max-w-4xl">
-        <h1 className="font-serif text-[2.9rem] leading-none tracking-[-0.04em] text-ink md:text-[4rem]">
+        <h1 className="font-serif text-[2.6rem] font-normal leading-tight tracking-[-0.03em] text-ink md:text-[3.2rem]">
           Daily Brief
         </h1>
         <p className="mt-5 text-lg text-muted">
@@ -175,13 +175,13 @@ export function DailyBriefPage({
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div>
-                    <h2 className={`text-[2rem] font-medium leading-tight ${brief.tone}`}>
+                    <h2 className={`text-[1.7rem] font-medium leading-tight ${brief.tone}`}>
                       {brief.title}
                     </h2>
                   </div>
                   <span className="mt-1 text-sm text-faint">{brief.updated} →</span>
                 </div>
-                <ul className="mt-4 space-y-2 text-[15px] leading-8 text-ink">
+                <ul className="mt-4 space-y-2 text-[18px] leading-8 text-ink">
                   {brief.bullets.map((bullet) => (
                     <li key={bullet} className="flex items-start gap-3">
                       <span className="mt-[0.8rem] h-1.5 w-1.5 flex-none rounded-full bg-[#54504b]" />

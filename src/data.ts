@@ -170,7 +170,7 @@ const responses: Record<string, DemoResponse> = {
         headers: ["User", "Account", "Last recorded activity"],
         rows: [
           ["Sarah Chen", "Northshore Capital", "Exported 2 memos · 4 Jun 2026"],
-          ["James Okonkwo", "Helios Partners", "Last login · 3 Jun 2026"],
+          ["James Okonkwo", "Helios Partners", "Used Note-Taker · 3 Jun 2026"],
           ["Priya Mehta", "Cedar Ridge AM", "Viewed onboarding brief · 2 Jun 2026"],
         ],
         sources: [
@@ -190,14 +190,14 @@ const responses: Record<string, DemoResponse> = {
   },
   "field-feedback": {
     role: "Product",
-    prompt: "What field feedback should I prioritise this week?",
+    prompt: "What user feedback should I prioritise this week?",
     answer: [
       {
         kind: "paragraph",
         text: "Prioritise three items: Office Plugin readiness confusion, citation quality on messy PDFs, and Grids dashboard expectations.",
         sources: [
           {
-            label: "Weekly Field Sync",
+            label: "Weekly User Sync",
             url: "https://notion.so",
             provider: "notion",
           },
@@ -208,7 +208,7 @@ const responses: Record<string, DemoResponse> = {
         text: "Office Plugin confusion is the most urgent because Sales and EMs are unclear on whether it is sellable, demoable or pilot-only. Citation quality is showing up across document-heavy workflows, especially where source packs include messy PDFs. The Grids issue is mainly expectation-setting: older screenshots are still appearing in client-facing materials even though the current dashboard view remains internal-only.",
         sources: [
           {
-            label: "Slack #product-field-questions",
+            label: "Slack #product-user-questions",
             url: "https://slack.com",
             provider: "slack",
           },
@@ -420,8 +420,8 @@ export const promptsByRole: Record<Role, PromptDefinition[]> = {
   Product: [
     {
       role: "Product",
-      text: "Field feedback priorities",
-      query: "What field feedback should I prioritise this week?",
+      text: "User feedback priorities",
+      query: "What user feedback should I prioritise this week?",
       responseId: "field-feedback",
       icon: "inbox",
     },
@@ -475,7 +475,7 @@ const fallbackResponse: DemoResponse = {
     },
     {
       kind: "paragraph",
-      text: "Try one of the suggested prompts for your current role, or ask about the Office Plugin, Goldman Sachs talk track, UBS onboarding, user churn, field feedback, roadmap progress, Chat bug fixes, or open PR reviews.",
+      text: "Try one of the suggested prompts for your current role, or ask about the Office Plugin, Goldman Sachs talk track, UBS onboarding, user churn, user feedback, roadmap progress, Chat bug fixes, or open PR reviews.",
       sources: [
         {
           label: "Slack #ops-agent-feedback",
@@ -494,7 +494,7 @@ const keywordMatchers: Array<{ match: (input: string) => boolean; responseId: st
   { match: (input) => input.includes("goldman") || input.includes("gs talk"), responseId: "goldman-sachs" },
   { match: (input) => input.includes("office plugin"), responseId: "office-plugin" },
   { match: (input) => input.includes("roadmap") || input.includes("stock-take") || input.includes("tracking against"), responseId: "roadmap-progress" },
-  { match: (input) => input.includes("field feedback") || input.includes("prioritise") || input.includes("prioritize"), responseId: "field-feedback" },
+  { match: (input) => input.includes("user feedback") || input.includes("prioritise") || input.includes("prioritize"), responseId: "field-feedback" },
   { match: (input) => input.includes("pr review") || input.includes("review comment") || input.includes("open pr"), responseId: "pr-reviews" },
   { match: (input) => input.includes("bug fix") || input.includes("chat product"), responseId: "chat-bug-fix" },
 ];
