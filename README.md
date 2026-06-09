@@ -1,6 +1,39 @@
-# Ops Agent
+# Model ML Workspace Prototype
 
-Ops Agent is a polished React/Vite prototype for an internal Model ML conversational readiness assistant. It demonstrates a calm, premium chat workspace with role-aware prompt cards, hardcoded trust trails, and a simulated response delay.
+Model ML Workspace is a React/Vite front-end prototype for a role-aware internal workspace. The current build includes three navigable experiences inside a shared sidebar shell: `Agent`, `The Hub`, and `Daily Brief`.
+
+## Current layout
+
+### Agent
+
+- Multi-role chat workspace for `EM`, `Sales`, `Product`, and `Engineering`
+- Role-specific suggested prompts with a simulated response flow
+- Typed questions return the standard answer format without source citations
+
+### The Hub
+
+- Curated knowledge page for playbooks, learnings, and references
+- Clickable filters for `For You`, `EM`, `Sales`, `Product`, and `Engineering`
+- Cross-functional `For You` view designed from an EM perspective
+
+### Daily Brief
+
+- Curated briefing page for high-signal updates across Model ML
+- Card-based summaries for product, field, engineering, and action-oriented signals
+- Quick actions row for lightweight follow-up actions
+
+### Sidebar
+
+- Persistent dark navy workspace sidebar
+- Active-state highlighting for `Agent`, `The Hub`, and `Daily Brief`
+- Integration list for `Slack`, `Linear`, `Notion`, and `GitHub`
+
+## Tech stack
+
+- `React 18`
+- `TypeScript`
+- `Vite`
+- `Tailwind CSS`
 
 ## Local development
 
@@ -9,23 +42,25 @@ npm install
 npm run dev
 ```
 
-## Build
+## Production build
 
 ```bash
 npm run build
 ```
 
-## Vercel deployment
+## Deployment
 
-1. Push the project to GitHub.
-2. Import the repository into Vercel.
-3. Choose the `Vite` framework preset.
-4. Set the build command to `npm run build`.
-5. Set the output directory to `dist`.
-6. Deploy.
+This project is ready for static deployment platforms such as Vercel.
+
+1. Push the project to GitHub
+2. Import the repository into Vercel
+3. Choose the `Vite` framework preset
+4. Set the build command to `npm run build`
+5. Set the output directory to `dist`
+6. Deploy
 
 ## Notes
 
-- The app is front-end only and uses hardcoded dummy data.
-- Only the Agent/chat experience is active in V1.
-- Sidebar navigation for Knowledge Hub, Updates, and Saved Briefs is present as placeholder UI.
+- The app is front-end only and uses hardcoded prototype data
+- The current experience is designed for layout and interaction demos rather than production workflows
+- Brand assets for integrations and Model ML are stored under `public/brand/`

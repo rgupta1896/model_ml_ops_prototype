@@ -16,6 +16,15 @@ export function PromptIconGlyph({ icon, className = "h-3.5 w-3.5" }: IconProps) 
           <path strokeLinecap="round" strokeLinejoin="round" d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
         </svg>
       );
+    case "team":
+      return (
+        <svg className={className} viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth={strokeWidth} aria-hidden="true">
+          <circle cx="9" cy="8" r="2.75" />
+          <circle cx="16.5" cy="9.5" r="2.25" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 18a4.5 4.5 0 0 1 9 0" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M14.25 18a3.75 3.75 0 0 1 6.75 0" />
+        </svg>
+      );
     case "chart-down":
       return (
         <svg className={className} viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth={strokeWidth} aria-hidden="true">

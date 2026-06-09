@@ -7,12 +7,14 @@ type ResponseCardProps = {
   content: AnswerBlock[];
   attachments?: ResponseAttachment[];
   lastUpdated: string;
+  showSources?: boolean;
 };
 
 export function ResponseCard({
   content,
   attachments,
   lastUpdated,
+  showSources = true,
 }: ResponseCardProps) {
   return (
     <article className="max-w-[760px]">
@@ -22,7 +24,7 @@ export function ResponseCard({
             return (
               <p key={`paragraph-${index}`}>
                 {block.text}
-                <SourceCitation sources={block.sources} />
+                {showSources ? <SourceCitation sources={block.sources} /> : null}
               </p>
             );
           }
@@ -61,9 +63,11 @@ export function ResponseCard({
                     </tbody>
                   </table>
                 </div>
-                <p>
-                  <SourceCitation sources={block.sources} />
-                </p>
+                {showSources ? (
+                  <p>
+                    <SourceCitation sources={block.sources} />
+                  </p>
+                ) : null}
               </div>
             );
           }

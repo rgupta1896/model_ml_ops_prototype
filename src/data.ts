@@ -391,7 +391,7 @@ export const promptsByRole: Record<Role, PromptDefinition[]> = {
       text: "UBS Asset Management onboarding",
       query: "What should I know before joining the UBS Asset Management account?",
       responseId: "ubs-onboarding",
-      icon: "paperclip",
+      icon: "team",
     },
     {
       role: "EM",

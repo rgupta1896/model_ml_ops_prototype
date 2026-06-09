@@ -11,11 +11,11 @@ const sizeClasses = {
 
 export function ModelMLIcon({ className = "", size = "md" }: ModelMLIconProps) {
   return (
-    <div
-      className={`flex flex-none items-center justify-center bg-navy font-serif font-semibold tracking-[-0.04em] text-gold shadow-[0_4px_14px_rgba(12,20,36,0.18)] ${sizeClasses[size]} ${className}`}
+    <img
+      src="/brand/model-ml.png"
+      alt=""
+      className={`flex-none object-contain ${sizeClasses[size]} ${className}`}
       aria-hidden="true"
-    >
-      ML
-    </div>
+    />
   );
 }

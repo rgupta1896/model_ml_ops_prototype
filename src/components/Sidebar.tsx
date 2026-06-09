@@ -4,17 +4,28 @@ import {
   NotionIcon,
   SlackIcon,
 } from "./icons/IntegrationIcons";
+import type { WorkspaceTab } from "../types";
 
 type SidebarProps = {
-  activeItem: string;
+  activeItem: WorkspaceTab;
+  onSelect: (item: WorkspaceTab) => void;
 };
 
 const navigationItems = [
-  { label: "Agent", active: true },
-  { label: "Knowledge Hub", active: false },
-  { label: "Updates", active: false },
-  { label: "Saved Briefs", active: false },
-];
+  {
+    label: "Agent",
+    description: "Customised AI agent with user context-awareness",
+  },
+  {
+    label: "The Hub",
+    description:
+      "Central repository for client learnings, best practices, product updates, and cross-team knowledge-sharing",
+  },
+  {
+    label: "Daily Brief",
+    description: "Agent-generated daily digests relevant to each role or pod",
+  },
+] as const;
 
 const integrations = [
   { label: "Slack", icon: SlackIcon, connected: true },
@@ -23,9 +34,9 @@ const integrations = [
   { label: "GitHub", icon: GithubIcon, connected: true },
 ] as const;
 
-export function Sidebar({ activeItem }: SidebarProps) {
+export function Sidebar({ activeItem, onSelect }: SidebarProps) {
   return (
-    <aside className="flex h-full w-[248px] flex-none flex-col bg-navy px-5 py-7 text-mist">
+    <aside className="flex min-h-screen self-stretch w-[248px] flex-none flex-col bg-navy px-5 py-7 text-mist">
       <div className="font-sans text-[1.65rem] font-medium leading-none tracking-[-0.03em] text-mist">
         Model ML
       </div>
@@ -41,16 +52,28 @@ export function Sidebar({ activeItem }: SidebarProps) {
               <button
                 key={item.label}
                 type="button"
-                disabled={!item.active}
-                className={`flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left text-sm transition ${
+                onClick={() => onSelect(item.label)}
+                className={`relative flex w-full items-start justify-between gap-3 rounded-xl px-3 py-2.5 text-left transition ${
                   isActive
-                    ? "bg-navyLight text-mist"
+                    ? "bg-navyLight text-mist shadow-[0_14px_30px_rgba(7,12,24,0.28)] ring-1 ring-[#2a3347]"
                     : "text-[#9aa3b2] hover:bg-navyLight/60 hover:text-mist"
-                } ${item.active ? "" : "cursor-not-allowed opacity-60"}`}
+                }`}
               >
-                <span>{item.label}</span>
                 {isActive ? (
-                  <span className="h-1.5 w-1.5 rounded-full bg-gold" />
+                  <span className="absolute inset-y-2 left-0 w-1 rounded-r-full bg-gold" />
+                ) : null}
+                <span className="min-w-0">
+                  <span className={`block text-sm font-medium leading-5 ${isActive ? "text-mist" : ""}`}>
+                    {item.label}
+                  </span>
+                  {item.description ? (
+                    <span className={`mt-0.5 block text-xs leading-4 ${isActive ? "text-[#aeb7c7]" : "text-[#7d8698]"}`}>
+                      {item.description}
+                    </span>
+                  ) : null}
+                </span>
+                {isActive ? (
+                  <span className="mt-1 h-1.5 w-1.5 flex-none rounded-full bg-gold" />
                 ) : null}
               </button>
             );

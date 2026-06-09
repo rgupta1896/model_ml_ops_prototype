@@ -20,20 +20,6 @@ function ProductIcon({ className = "h-3.5 w-3.5" }: IconProps) {
   );
 }
 
-function EngineeringIcon({ className = "h-3.5 w-3.5" }: IconProps) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <rect x="3" y="3" width="18" height="18" rx="4" fill="#6B7280" />
-      <path
-        d="M9 9l6 6M15 9l-6 6"
-        stroke="white"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
 export function SourceProviderIcon({
   provider,
   className = "h-3.5 w-3.5",
@@ -55,7 +41,7 @@ export function SourceProviderIcon({
     case "casejam":
       return <ModelMLIcon className={className} size="sm" />;
     case "engineering":
-      return <EngineeringIcon className={className} />;
+      return <ModelMLIcon className={className} size="sm" />;
     default:
       return <ProductIcon className={className} />;
   }

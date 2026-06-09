@@ -1,7 +1,10 @@
 export type Role = "Sales" | "EM" | "Product" | "Engineering";
 
+export type WorkspaceTab = "Agent" | "The Hub" | "Daily Brief";
+
 export type PromptIcon =
   | "paperclip"
+  | "team"
   | "chart-down"
   | "presentation"
   | "building"
@@ -77,4 +80,5 @@ export type Message =
       content: AnswerBlock[];
       attachments?: ResponseAttachment[];
       lastUpdated: string;
+      showSources?: boolean;
     };

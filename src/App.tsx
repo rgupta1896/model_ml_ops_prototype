@@ -4,8 +4,10 @@ import { RoleChips } from "./components/RoleChips";
 import { Sidebar } from "./components/Sidebar";
 import { SuggestedPromptPill } from "./components/SuggestedPromptPill";
 import { TypingIndicator } from "./components/TypingIndicator";
+import { DailyBriefPage } from "./components/workspace/DailyBriefPage";
+import { KnowledgeHubPage } from "./components/workspace/KnowledgeHubPage";
 import { getResponseForInput, promptsByRole, roles } from "./data";
-import type { Message, PromptDefinition, Role } from "./types";
+import type { Message, PromptDefinition, Role, WorkspaceTab } from "./types";
 
 function getGreeting() {
   const hour = new Date().getHours();
@@ -27,6 +29,7 @@ function formatToday() {
 }
 
 function App() {
+  const [activeWorkspace, setActiveWorkspace] = useState<WorkspaceTab>("Agent");
   const [activeRole, setActiveRole] = useState<Role>("Sales");
   const [inputValue, setInputValue] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
@@ -36,6 +39,8 @@ function App() {
 
   const suggestedPrompts = promptsByRole[activeRole];
   const hasConversation = messages.length > 0 || isTyping;
+  const activeAgentLabel = `${activeRole} Agent`;
+  const formattedDate = formatToday();
 
   useEffect(() => {
     return () => {
@@ -64,7 +69,7 @@ function App() {
     setInputValue("");
   }
 
-  function queueResponse(question: string, role: Role) {
+  function queueResponse(question: string, role: Role, showSources = false) {
     if (pendingTimeoutId) {
       window.clearTimeout(pendingTimeoutId);
       setPendingTimeoutId(null);
@@ -99,6 +104,7 @@ function App() {
           content: response.answer,
           attachments: response.attachments,
           lastUpdated: response.lastUpdated,
+          showSources,
         },
       ]);
       setIsTyping(false);
@@ -109,41 +115,52 @@ function App() {
   }
 
   function handlePromptClick(prompt: PromptDefinition) {
-    queueResponse(prompt.query, prompt.role);
+    queueResponse(prompt.query, prompt.role, true);
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    queueResponse(inputValue, activeRole);
+    queueResponse(inputValue, activeRole, false);
   }
 
   return (
     <div className="flex min-h-screen bg-cream text-ink">
-      <Sidebar activeItem="Agent" />
+      <Sidebar activeItem={activeWorkspace} onSelect={setActiveWorkspace} />
 
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="border-b border-[#ddd6ca] bg-[#ebe4d8] px-8 py-4 lg:px-10">
           <div className="flex items-center justify-between gap-6">
-            <RoleChips
-              activeRole={activeRole}
-              roles={roles}
-              onSelect={resetConversation}
-            />
-            <p className="hidden text-sm text-muted sm:block">{formatToday()}</p>
+            {activeWorkspace === "Daily Brief" || activeWorkspace === "The Hub" ? (
+              <div />
+            ) : (
+              <RoleChips
+                activeRole={activeRole}
+                roles={roles}
+                onSelect={activeWorkspace === "Agent" ? resetConversation : setActiveRole}
+              />
+            )}
+            <p className="hidden text-sm text-muted sm:block">{formattedDate}</p>
           </div>
         </header>
 
         <main className="flex flex-1 flex-col px-8 py-10 lg:px-10">
-          {!hasConversation ? (
+          {activeWorkspace === "The Hub" ? (
+            <KnowledgeHubPage />
+          ) : activeWorkspace === "Daily Brief" ? (
+            <DailyBriefPage scope="For You" />
+          ) : !hasConversation ? (
             <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center pt-[10vh] sm:pt-[12vh]">
               <h1 className="text-center font-serif text-[2.6rem] font-normal leading-tight tracking-[-0.03em] text-ink md:text-[3.2rem]">
                 {getGreeting()}, Raghav
               </h1>
+              <p className="mt-5 max-w-2xl text-center text-[15px] leading-7 text-muted">
+                Ops Agent connects internal sources into role-aware context. Select a role to see the questions that matter for that team, or ask directly.
+              </p>
 
               <form onSubmit={handleSubmit} className="mt-10 w-full">
                 <div className="rounded-[28px] border border-[#ddd8cf] bg-white p-4 shadow-[0_8px_30px_rgba(34,31,29,0.06)]">
                   <label>
-                    <span className="sr-only">Ask Ops Agent a question</span>
+                    <span className="sr-only">Ask {activeAgentLabel} a question</span>
                     <textarea
                       value={inputValue}
                       onChange={(event) => setInputValue(event.target.value)}
@@ -161,7 +178,7 @@ function App() {
                       +
                     </button>
                     <div className="flex items-center gap-3">
-                      <span className="text-sm text-faint">Ops Agent · {activeRole}</span>
+                      <span className="text-sm text-faint">{activeAgentLabel}</span>
                       <button
                         type="button"
                         className="flex h-9 w-9 items-center justify-center rounded-full text-faint"
@@ -194,10 +211,6 @@ function App() {
                   />
                 ))}
               </div>
-
-              <p className="mt-8 min-h-[3rem] max-w-lg text-center text-sm leading-6 text-faint">
-                Scoped to {activeRole} — cuts through the noise and surfaces what you need to know
-              </p>
             </div>
           ) : (
             <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col">
@@ -218,19 +231,20 @@ function App() {
                         content={message.content}
                         attachments={message.attachments}
                         lastUpdated={message.lastUpdated}
+                        showSources={message.showSources}
                       />
                     </div>
                   ),
                 )}
 
-                {isTyping ? <TypingIndicator /> : null}
+                {isTyping ? <TypingIndicator agentLabel={activeAgentLabel} /> : null}
               </div>
 
               <form onSubmit={handleSubmit} className="sticky bottom-0 border-t border-[#e5dfd4] bg-cream/95 pb-2 pt-4 backdrop-blur-sm">
                 <div className="rounded-[24px] border border-[#ddd8cf] bg-white p-3 shadow-[0_4px_20px_rgba(34,31,29,0.05)]">
                   <div className="flex items-end gap-3">
                     <label className="flex-1">
-                      <span className="sr-only">Ask Ops Agent a question</span>
+                      <span className="sr-only">Ask {activeAgentLabel} a question</span>
                       <textarea
                         value={inputValue}
                         onChange={(event) => setInputValue(event.target.value)}
