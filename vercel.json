@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/tom",
+      "destination": "/"
+    }
+  ]
+}
